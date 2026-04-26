@@ -8,8 +8,9 @@ POSITIVE_TERMS = {
     "good", "great", "happy", "love", "loved", "powerful", "smooth", "win",
 }
 NEGATIVE_TERMS = {
-    "bad", "broken", "bug", "crash", "hate", "poor", "sad", "slow", "terrible",
-    "worse", "worst", "angry", "issue", "failed", "failure", "unhappy",
+    "bad", "broken", "bug", "crash", "crashed", "damaged", "hate", "late",
+    "poor", "sad", "slow", "terrible", "worse", "worst", "angry", "issue",
+    "failed", "failure", "unhappy",
 }
 NEGATORS = {"no", "not", "never", "cannot", "cant", "can't", "wont", "won't"}
 
@@ -60,4 +61,3 @@ def analyze_sentiment(payload: SentimentRequest) -> SentimentResponse:
         negative_terms=negative_hits,
         explanation=explanation,
     )
-

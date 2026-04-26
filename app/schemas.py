@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PreprocessOptions(BaseModel):
@@ -80,6 +80,43 @@ class AnnotationResponse(BaseModel):
     summary: dict[str, int]
 
 
+class TopicSignal(BaseModel):
+    name: str
+    score: float
+    evidence: list[str]
+
+
+class ActionRecommendation(BaseModel):
+    action: str
+    owner: str
+    reason: str
+
+
+class ModelSignal(BaseModel):
+    model: str
+    prediction: str
+    confidence: float
+    role: str
+
+
+class TriageInsight(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
+    priority: str
+    urgency_score: float
+    topic: TopicSignal
+    recommendation: ActionRecommendation
+    model_signals: list[ModelSignal]
+
+
+class CorpusInsight(BaseModel):
+    dominant_topic: str
+    risk_level: str
+    negative_share: float
+    recommended_next_step: str
+    topic_distribution: list[TopicSignal]
+
+
 class PipelineRequest(BaseModel):
     documents: list[str] = Field(..., min_length=1, max_length=25)
     options: PreprocessOptions = Field(default_factory=PreprocessOptions)
@@ -89,10 +126,11 @@ class PipelineDocument(BaseModel):
     preprocessing: PreprocessResponse
     sentiment: SentimentResponse
     annotations: AnnotationResponse
+    triage: TriageInsight
 
 
 class PipelineResponse(BaseModel):
     documents: list[PipelineDocument]
     corpus_analytics: TextAnalytics
     top_terms: list[TokenMetric]
-
+    corpus_insight: CorpusInsight

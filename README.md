@@ -1,16 +1,30 @@
-# NLP Preprocessing Engine
+# Clarity: Feedback Triage
 
-A production-style full-stack NLP workbench built from the notebook ideas in
+A production-style ML/NLP project built from the notebook ideas in
 [`Aadithyaar22/-NLP-Preprocessing-Engine`](https://github.com/Aadithyaar22/-NLP-Preprocessing-Engine).
 
-It turns the original assignment notebooks into a usable API and frontend for:
+## Goal
 
-- Advanced text preprocessing
+**Clarity**
+
+Clarity helps teams understand messy customer feedback. Paste reviews, support
+tickets, or social comments, and the app cleans the text, detects sentiment,
+assigns priority, identifies themes, recommends owners, and exports a triage
+report.
+
+## Features
+
+- Advanced NLP preprocessing
 - Batch corpus analytics
-- Token frequency and quality signals
-- Sentiment classification
-- Lightweight token annotation
-- A polished browser dashboard served by FastAPI
+- Sentiment analysis with negation handling
+- Priority and urgency scoring
+- Topic/theme detection for real customer issues
+- Recommended owner and next action
+- Classical ML and DL model-lab comparison surface
+- POS/chunk-style token annotation
+- Exportable JSON triage report
+- FastAPI backend with interactive API docs
+- Polished browser frontend
 
 ## Run Locally
 
@@ -38,4 +52,3 @@ Important endpoints:
 - `POST /api/v1/sentiment`
 - `POST /api/v1/annotate`
 - `POST /api/v1/pipeline`
-

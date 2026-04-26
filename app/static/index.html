@@ -7,134 +7,142 @@
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-mark">N</span>
+    <header class="appbar">
+      <div class="identity">
+        <span class="mark">C</span>
         <div>
-          <strong>NLP Engine</strong>
-          <small>Production Workbench</small>
+          <strong>Clarity</strong>
+          <span>Feedback Triage</span>
         </div>
       </div>
-      <nav class="nav">
-        <a href="#workbench" class="active">Workbench</a>
-        <a href="#analytics">Analytics</a>
-        <a href="#tokens">Tokens</a>
-        <a href="/docs" target="_blank" rel="noreferrer">API Docs</a>
-      </nav>
-      <div class="status-card">
+      <div class="status">
         <span class="status-dot"></span>
-        <div>
-          <strong id="serviceStatus">Checking API</strong>
-          <small id="serviceVersion">FastAPI backend</small>
-        </div>
+        <span id="serviceStatus">Checking API</span>
+        <small id="serviceVersion">FastAPI backend</small>
       </div>
-    </aside>
+      <a class="doc-link" href="/docs" target="_blank" rel="noreferrer">API</a>
+    </header>
 
-    <main class="shell">
-      <header class="topbar">
+    <main class="triage">
+      <section class="goal">
         <div>
-          <p class="eyebrow">Notebook logic, production surface</p>
-          <h1>NLP Preprocessing Engine</h1>
+          <span class="one-word">Clarity</span>
+          <h1>Find what customers are really saying.</h1>
         </div>
-        <div class="actions">
-          <button id="sampleBtn" class="ghost" type="button">Load sample</button>
-          <button id="runBtn" type="button">Run pipeline</button>
-        </div>
-      </header>
-
-      <section id="workbench" class="workspace">
-        <section class="editor panel">
-          <div class="panel-head">
-            <div>
-              <h2>Input Corpus</h2>
-              <p>One document per line for batch processing.</p>
-            </div>
-            <span id="docCount" class="pill">0 docs</span>
-          </div>
-          <textarea id="inputText" spellcheck="false">I absolutely looooved this product!!!
-Worst service ever... 0/10
-I am not happy with the slow response
-Visit https://openai.com now!</textarea>
-        </section>
-
-        <section class="controls panel">
-          <div class="panel-head">
-            <div>
-              <h2>Pipeline Controls</h2>
-              <p>Toggle preprocessing stages.</p>
-            </div>
-          </div>
-          <div class="toggle-grid">
-            <label><input type="checkbox" data-option="lowercase" checked /> Lowercase</label>
-            <label><input type="checkbox" data-option="remove_urls" checked /> Remove URLs</label>
-            <label><input type="checkbox" data-option="remove_emails" checked /> Remove emails</label>
-            <label><input type="checkbox" data-option="remove_numbers" checked /> Remove numbers</label>
-            <label><input type="checkbox" data-option="normalize_repeats" checked /> Normalize repeats</label>
-            <label><input type="checkbox" data-option="remove_punctuation" checked /> Remove punctuation</label>
-            <label><input type="checkbox" data-option="remove_stopwords" /> Remove stopwords</label>
-            <label><input type="checkbox" data-option="preserve_negations" checked /> Preserve negations</label>
-          </div>
-          <div class="range-row">
-            <label for="minLength">Minimum token length</label>
-            <input id="minLength" type="range" min="1" max="8" value="2" />
-            <strong id="minLengthValue">2</strong>
-          </div>
-        </section>
+        <p>
+          Paste messy reviews, support tickets, or social comments. The engine cleans the language,
+          scores sentiment, and surfaces repeated terms so teams can spot product issues faster.
+        </p>
       </section>
 
-      <section id="analytics" class="metrics">
-        <article class="metric">
-          <span>Tokens</span>
-          <strong id="metricTokens">0</strong>
-        </article>
-        <article class="metric">
-          <span>Unique</span>
-          <strong id="metricUnique">0</strong>
-        </article>
-        <article class="metric">
-          <span>Diversity</span>
-          <strong id="metricDiversity">0.000</strong>
-        </article>
-        <article class="metric">
-          <span>Noise</span>
-          <strong id="metricNoise">0.000</strong>
-        </article>
-      </section>
-
-      <section class="results-grid">
-        <section class="panel">
-          <div class="panel-head">
+      <section class="board">
+        <aside class="intake">
+          <div class="section-head">
+            <span>01</span>
             <div>
-              <h2>Documents</h2>
-              <p>Cleaned text, warnings, and sentiment.</p>
+              <h2>Intake</h2>
+              <p>One customer note per line.</p>
+            </div>
+          </div>
+          <textarea id="inputText" spellcheck="false">Delivery was late and support never replied.
+I loved the clean checkout flow.
+The app crashed twice after payment.
+Packaging was excellent but tracking was confusing.</textarea>
+          <div class="button-row">
+            <button id="runBtn" type="button">Analyze</button>
+            <button id="sampleBtn" class="quiet" type="button">Sample</button>
+          </div>
+          <button id="exportBtn" class="report-button" type="button">Export report</button>
+          <div class="mini-stat">
+            <span id="docCount">0 docs</span>
+            <span>Ready for triage</span>
+          </div>
+        </aside>
+
+        <section class="queue">
+          <div class="section-head">
+            <span>02</span>
+            <div>
+              <h2>Signal Queue</h2>
+              <p>Cleaned notes and sentiment direction.</p>
             </div>
           </div>
           <div id="documents" class="document-list"></div>
         </section>
 
-        <section id="tokens" class="panel">
-          <div class="panel-head">
+        <aside class="insights">
+          <div class="section-head">
+            <span>03</span>
             <div>
-              <h2>Top Terms</h2>
-              <p>Corpus frequency distribution.</p>
+              <h2>Insights</h2>
+              <p>Corpus health and repeated language.</p>
             </div>
           </div>
+          <div class="metrics">
+            <article>
+              <span>Tokens</span>
+              <strong id="metricTokens">0</strong>
+            </article>
+            <article>
+              <span>Unique</span>
+              <strong id="metricUnique">0</strong>
+            </article>
+            <article>
+              <span>Diversity</span>
+              <strong id="metricDiversity">0.000</strong>
+            </article>
+            <article>
+              <span>Noise</span>
+              <strong id="metricNoise">0.000</strong>
+            </article>
+          </div>
+          <div id="riskPanel" class="risk-panel"></div>
           <div id="terms" class="term-list"></div>
-        </section>
-
-        <section class="panel wide">
-          <div class="panel-head">
-            <div>
-              <h2>Token Annotation</h2>
-              <p>Rule-based POS and chunk labels for quick inspection.</p>
-            </div>
-          </div>
-          <div id="annotations" class="annotation-table"></div>
-        </section>
+        </aside>
       </section>
+
+      <section class="ml-lab">
+        <div class="section-head">
+          <span>04</span>
+          <div>
+            <h2>Model Lab</h2>
+            <p>Compare interpretable NLP, classical ML, and DL deployment readiness.</p>
+          </div>
+        </div>
+        <div id="modelLab" class="model-grid"></div>
+      </section>
+
+      <section class="language-map">
+        <div class="section-head">
+          <span>05</span>
+          <div>
+            <h2>Language Map</h2>
+            <p>POS and chunk labels for the first note.</p>
+          </div>
+        </div>
+        <div id="annotations" class="annotation-table"></div>
+      </section>
+
+      <details class="advanced">
+        <summary>Preprocessing settings</summary>
+        <div class="toggle-grid">
+          <label><input type="checkbox" data-option="lowercase" checked /> Lowercase</label>
+          <label><input type="checkbox" data-option="remove_urls" checked /> URLs</label>
+          <label><input type="checkbox" data-option="remove_emails" checked /> Emails</label>
+          <label><input type="checkbox" data-option="remove_numbers" checked /> Numbers</label>
+          <label><input type="checkbox" data-option="normalize_repeats" checked /> Repeats</label>
+          <label><input type="checkbox" data-option="remove_punctuation" checked /> Punctuation</label>
+          <label><input type="checkbox" data-option="remove_stopwords" /> Stopwords</label>
+          <label><input type="checkbox" data-option="preserve_negations" checked /> Negations</label>
+        </div>
+        <div class="range-row">
+          <label for="minLength">Minimum token length</label>
+          <input id="minLength" type="range" min="1" max="8" value="2" />
+          <strong id="minLengthValue">2</strong>
+        </div>
+      </details>
     </main>
 
     <script src="/static/app.js" type="module"></script>
   </body>
 </html>
-

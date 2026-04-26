@@ -1,6 +1,7 @@
 const inputText = document.querySelector("#inputText");
 const runBtn = document.querySelector("#runBtn");
 const sampleBtn = document.querySelector("#sampleBtn");
+const exportBtn = document.querySelector("#exportBtn");
 const minLength = document.querySelector("#minLength");
 const minLengthValue = document.querySelector("#minLengthValue");
 const docCount = document.querySelector("#docCount");
@@ -18,11 +19,15 @@ const metrics = {
 const documentsEl = document.querySelector("#documents");
 const termsEl = document.querySelector("#terms");
 const annotationsEl = document.querySelector("#annotations");
+const riskPanelEl = document.querySelector("#riskPanel");
+const modelLabEl = document.querySelector("#modelLab");
+const API_BASE = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
+let latestPayload = null;
 
 const samples = [
-  "Get 100% FREE access now!!!\nI absolutely looooved this product\nWorst service ever... 0/10\nCall me at 9876543210\nThis is THE best course!!!\nVisit https://openai.com now!\nNooooo this is baaad!!!\nOK OK OK I got it\nWin $$$ now!!! Limited offer!!!\nI am not happy with this",
-  "The quick brown fox jumps over a beautiful knowledge graph.\nOur production pipeline is fast, clean, and reliable.\nThis release is not slow and not broken anymore.",
-  "Email support@example.com for urgent access.\nThe model crashed twice but the new preprocessing flow is excellent.\nNever remove not from sentiment tasks.",
+  "Delivery was late and support never replied.\nI loved the clean checkout flow.\nThe app crashed twice after payment.\nPackaging was excellent but tracking was confusing.",
+  "The refund took 12 days and nobody explained why.\nYour mobile app is fast and the new search is great.\nI am not happy with the broken promo code.\nThe agent was helpful, but the wait time was terrible.",
+  "My order arrived damaged!!! Call me at 9876543210.\nThe product quality is amazing for the price.\nTracking emails went to support@example.com and never reached me.\nCheckout was smooth but returns were slow.",
 ];
 
 function documentsFromInput() {
@@ -48,12 +53,12 @@ function updateDocumentCount() {
 
 function setLoading(isLoading) {
   runBtn.disabled = isLoading;
-  runBtn.textContent = isLoading ? "Running..." : "Run pipeline";
+  runBtn.textContent = isLoading ? "Analyzing..." : "Analyze";
 }
 
 async function checkHealth() {
   try {
-    const response = await fetch("/health");
+    const response = await fetch(`${API_BASE}/health`);
     const payload = await response.json();
     serviceStatus.textContent = "API online";
     serviceVersion.textContent = `${payload.service} ${payload.version}`;
@@ -74,7 +79,7 @@ async function runPipeline() {
 
   setLoading(true);
   try {
-    const response = await fetch("/api/v1/pipeline", {
+    const response = await fetch(`${API_BASE}/api/v1/pipeline`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ documents, options: getOptions() }),
@@ -85,6 +90,7 @@ async function runPipeline() {
     }
 
     const payload = await response.json();
+    latestPayload = payload;
     renderPipeline(payload);
   } catch (error) {
     documentsEl.innerHTML = `<div class="doc"><p>${error.message}</p></div>`;
@@ -103,6 +109,7 @@ function renderPipeline(payload) {
   documentsEl.innerHTML = payload.documents
     .map((document, index) => {
       const sentiment = document.sentiment;
+      const triage = document.triage;
       const cleaned = document.preprocessing.cleaned_text || "No tokens retained";
       const warnings = document.preprocessing.warnings.length
         ? `<p>${document.preprocessing.warnings.join(" ")}</p>`
@@ -110,10 +117,15 @@ function renderPipeline(payload) {
       return `
         <article class="doc">
           <div class="doc-head">
-            <strong>Document ${index + 1}</strong>
+            <strong>${triage.priority} · Document ${index + 1}</strong>
             <span class="label ${sentiment.label}">${sentiment.label} ${Math.round(sentiment.confidence * 100)}%</span>
           </div>
           <p>${escapeHtml(cleaned)}</p>
+          <div class="triage-line">
+            <span>${escapeHtml(triage.topic.name)}</span>
+            <span>${escapeHtml(triage.recommendation.owner)}</span>
+            <span>${escapeHtml(triage.recommendation.action)}</span>
+          </div>
           ${warnings}
         </article>
       `;
@@ -121,7 +133,57 @@ function renderPipeline(payload) {
     .join("");
 
   renderTerms(payload.top_terms);
+  renderRisk(payload.corpus_insight);
+  renderModelLab(payload.documents);
   renderAnnotations(payload.documents[0]?.annotations.annotations ?? []);
+}
+
+function renderRisk(insight) {
+  const topics = insight.topic_distribution
+    .map((topic) => `<span>${escapeHtml(topic.name)} ${Math.round(topic.score * 100)}%</span>`)
+    .join("");
+  riskPanelEl.innerHTML = `
+    <div class="risk ${insight.risk_level.toLowerCase()}">
+      <span>Risk</span>
+      <strong>${escapeHtml(insight.risk_level)}</strong>
+    </div>
+    <p><strong>${escapeHtml(insight.dominant_topic)}</strong> is the leading theme. Negative share is ${Math.round(
+      insight.negative_share * 100,
+    )}%.</p>
+    <p>${escapeHtml(insight.recommended_next_step)}</p>
+    <div class="topic-pills">${topics}</div>
+  `;
+}
+
+function renderModelLab(documents) {
+  const signals = documents.flatMap((document) =>
+    document.triage.model_signals.map((signal) => ({
+      ...signal,
+      priority: document.triage.priority,
+      topic: document.triage.topic.name,
+      urgency: document.triage.urgency_score,
+    })),
+  );
+
+  modelLabEl.innerHTML = signals.length
+    ? signals
+        .slice(0, 9)
+        .map(
+          (signal) => `
+            <article class="model-card">
+              <div>
+                <strong>${escapeHtml(signal.model)}</strong>
+                <span>${escapeHtml(signal.role)}</span>
+              </div>
+              <p>${escapeHtml(signal.prediction)} · ${Math.round(signal.confidence * 100)}%</p>
+              <small>${escapeHtml(signal.priority)} · ${escapeHtml(signal.topic)} · urgency ${Math.round(
+                signal.urgency * 100,
+              )}%</small>
+            </article>
+          `,
+        )
+        .join("")
+    : '<p class="muted">Run analysis to compare model signals.</p>';
 }
 
 function renderTerms(terms) {
@@ -178,6 +240,19 @@ sampleBtn.addEventListener("click", () => {
   updateDocumentCount();
   runPipeline();
 });
+exportBtn.addEventListener("click", () => {
+  if (!latestPayload) {
+    return;
+  }
+  const report = JSON.stringify(latestPayload, null, 2);
+  const blob = new Blob([report], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "clarity-triage-report.json";
+  anchor.click();
+  URL.revokeObjectURL(url);
+});
 minLength.addEventListener("input", () => {
   minLengthValue.textContent = minLength.value;
 });
@@ -185,4 +260,3 @@ minLength.addEventListener("input", () => {
 updateDocumentCount();
 checkHealth();
 runPipeline();
-
