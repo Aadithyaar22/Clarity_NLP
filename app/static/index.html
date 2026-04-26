@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NLP Preprocessing Engine</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <div>
+          <strong>NLP Engine</strong>
+          <small>Production Workbench</small>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#workbench" class="active">Workbench</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#tokens">Tokens</a>
+        <a href="/docs" target="_blank" rel="noreferrer">API Docs</a>
+      </nav>
+      <div class="status-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong id="serviceStatus">Checking API</strong>
+          <small id="serviceVersion">FastAPI backend</small>
+        </div>
+      </div>
+    </aside>
+
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Notebook logic, production surface</p>
+          <h1>NLP Preprocessing Engine</h1>
+        </div>
+        <div class="actions">
+          <button id="sampleBtn" class="ghost" type="button">Load sample</button>
+          <button id="runBtn" type="button">Run pipeline</button>
+        </div>
+      </header>
+
+      <section id="workbench" class="workspace">
+        <section class="editor panel">
+          <div class="panel-head">
+            <div>
+              <h2>Input Corpus</h2>
+              <p>One document per line for batch processing.</p>
+            </div>
+            <span id="docCount" class="pill">0 docs</span>
+          </div>
+          <textarea id="inputText" spellcheck="false">I absolutely looooved this product!!!
+Worst service ever... 0/10
+I am not happy with the slow response
+Visit https://openai.com now!</textarea>
+        </section>
+
+        <section class="controls panel">
+          <div class="panel-head">
+            <div>
+              <h2>Pipeline Controls</h2>
+              <p>Toggle preprocessing stages.</p>
+            </div>
+          </div>
+          <div class="toggle-grid">
+            <label><input type="checkbox" data-option="lowercase" checked /> Lowercase</label>
+            <label><input type="checkbox" data-option="remove_urls" checked /> Remove URLs</label>
+            <label><input type="checkbox" data-option="remove_emails" checked /> Remove emails</label>
+            <label><input type="checkbox" data-option="remove_numbers" checked /> Remove numbers</label>
+            <label><input type="checkbox" data-option="normalize_repeats" checked /> Normalize repeats</label>
+            <label><input type="checkbox" data-option="remove_punctuation" checked /> Remove punctuation</label>
+            <label><input type="checkbox" data-option="remove_stopwords" /> Remove stopwords</label>
+            <label><input type="checkbox" data-option="preserve_negations" checked /> Preserve negations</label>
+          </div>
+          <div class="range-row">
+            <label for="minLength">Minimum token length</label>
+            <input id="minLength" type="range" min="1" max="8" value="2" />
+            <strong id="minLengthValue">2</strong>
+          </div>
+        </section>
+      </section>
+
+      <section id="analytics" class="metrics">
+        <article class="metric">
+          <span>Tokens</span>
+          <strong id="metricTokens">0</strong>
+        </article>
+        <article class="metric">
+          <span>Unique</span>
+          <strong id="metricUnique">0</strong>
+        </article>
+        <article class="metric">
+          <span>Diversity</span>
+          <strong id="metricDiversity">0.000</strong>
+        </article>
+        <article class="metric">
+          <span>Noise</span>
+          <strong id="metricNoise">0.000</strong>
+        </article>
+      </section>
+
+      <section class="results-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Documents</h2>
+              <p>Cleaned text, warnings, and sentiment.</p>
+            </div>
+          </div>
+          <div id="documents" class="document-list"></div>
+        </section>
+
+        <section id="tokens" class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Top Terms</h2>
+              <p>Corpus frequency distribution.</p>
+            </div>
+          </div>
+          <div id="terms" class="term-list"></div>
+        </section>
+
+        <section class="panel wide">
+          <div class="panel-head">
+            <div>
+              <h2>Token Annotation</h2>
+              <p>Rule-based POS and chunk labels for quick inspection.</p>
+            </div>
+          </div>
+          <div id="annotations" class="annotation-table"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static/app.js" type="module"></script>
+  </body>
+</html>
+
